@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<title></title>
+</head>
+<style type="text/css">
+	*{
+		margin: 0;
+		padding: 0;
+	}
+	.from_list{
+		width: 96%;
+		margin: 0 2%;
+		color: #353535;
+		line-height: 2rem;
+		background: #FFFFFF;
+		border-top: 1px solid #EEEEEE;
+		border-bottom: 1px solid #EEEEEE;
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: flex;
+		display: -webkit-flex;
+		align-items: center;
+		-webkit-align-items: center;
+		justify-content: space-between;
+		-webkit-justify-content: space-between;
+	}
+	#reset_btn {
+	    width: 4rem;
+	    color: #ffffff;
+	    font-size: 0.7rem;
+	    text-align: center;
+	    line-height: 1.5rem;
+	    background: #2F7DCD;
+	    border-radius: 0.15rem;
+	    -webkit-border-radius: 0.15rem;
+	}
+	.sign_box {
+		margin-top: 1rem;
+	    padding: 0 0.75rem 0.5rem 1rem;
+	    background: #ffffff;
+	}
+	.sign_content {
+	    border: 1px solid #CCCCCC;
+	}
+	#canvas_box {
+	    width: 100%;
+	    height: 10rem;
+	}
+	canvas {
+   		 height: 10rem !important;
+	}
+	.submit_box {
+		width: 92%;
+		margin: 0 4%;
+	    height: 2.4rem;
+	    line-height: 2.4rem;
+	    background: #2F7DCD;
+	   	border-radius: 0.2rem;
+	    color: white;
+	    text-align: center;
+</style>
+<body>
+	<div class="from_list _bor_bottom0"><div>商户手动签字 <var>*</var></div><div id="reset_btn">重写</div></div>
+    <div class="sign_box">
+        <div class="sign_content">
+            <div id="canvas_box"></div>
+        </div>
+    </div>
+     <div class="submit_box" id="submit_btn">提交</div>
+</body>
+<script type="text/javascript" src="./js/jquery.js"></script>
+<script type="text/javascript" src="./js/jSignature.min.js"></script>
+<script type="text/javascript" src="./js/flashcanvas.js"></script>
+<script type="text/javascript">
+	 // *********电子签名功能*********
+    let canvas_box = $("#canvas_box");    // 获取canvas标签
+    canvas_box.jSignature(); // 初始化签名画板，初始化之后就可以进行操作
+    let signImgSrc = "";   // 提交后台的图片路径
+
+    // 监听手动签名滑动开始、移动、释放时，执行输入框失去焦点的功能，解决签名时触发软键盘的问题
+    $("#canvas_box").on("touchstart mousemove touchend",function () {
+        // console.log("走签名-mousemove事件");
+        $("input,textarea").blur();
+    });
+     // 重置按钮，生成图片之后，可重置画板，并清空图片
+    $("#reset_btn").on("click",function (e) {
+        canvas_box.jSignature("reset");
+        signImgSrc = "";
+        e.preventDefault();
+    });
+    //提交签名
+    $("#submit_btn").on("click",function (e) {
+    	// 获取签名长度
+    	let signLen = canvas_box.jSignature("getData","native").length; 
+  		//签名判断，长度为0，提示客户签名
+    	if(signLen==0){	
+    		alert("请输入签名");
+    	}else{
+    		//当有商户签字时，赋值签字的base64码
+    		 let datapair = canvas_box.jSignature("getData","image");    // 获取签名的“base64”数据
+              console.log("datapair",datapair);
+
+            // 拼接完整的base64转码,根绝接口说明，传递。
+            signImgSrc = 'data:' + datapair[0] + "," + datapair[1];
+             console.log('确认后的base64路径=',signImgSrc);
+    	}
+    })
+</script>
+</html>
